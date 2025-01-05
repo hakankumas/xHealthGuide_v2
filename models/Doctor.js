@@ -35,7 +35,7 @@ module.exports = class Doctor {
         `);
     }
 
-    // *TODO Doktorların Cinsiyetlerine Göre Dağılımı
+    // TODO| Doktorların Cinsiyetlerine Göre Dağılımı
     static distribution_of_doctors_by_gender() {
         return connection.execute(`
             SELECT
@@ -45,6 +45,7 @@ module.exports = class Doctor {
             FROM doctor
             INNER JOIN gender ON doctor.gender_id = gender.id
             GROUP BY gender.id
+            ORDER BY number DESC
         `);
     }
 
@@ -66,7 +67,7 @@ module.exports = class Doctor {
         `);
     }
 
-    // *TODO Dahiliye Doktorlarının Muayene Dağılımı
+    // TODO| Dahiliye Doktorlarının Muayene Dağılımı
     static distribution_of_examination_by_internists() {
         return connection.execute(`
             SELECT
@@ -77,10 +78,11 @@ module.exports = class Doctor {
             INNER JOIN sick ON examination.sick_id = sick.id
             INNER JOIN doctor ON examination.doctor_id = doctor.id
             GROUP BY doctor.id
+            ORDER BY number DESC
         `);
     }
 
-    // *TODO Aylara Göre Dahiliye Departmanındaki Toplam Muayene Sayıları
+    // TODO| Aylara Göre Dahiliye Departmanındaki Toplam Muayene Sayıları
     static monthly_examination_numbers_of_all_internists() {
         return connection.execute(`
             SELECT
@@ -93,7 +95,7 @@ module.exports = class Doctor {
         `);
     }
 
-    // *TODO Aylara Göre Dahiliye Departmanındaki Doktorların Bireysel Muayene Sayıları
+    // TODO| Aylara Göre Dahiliye Departmanındaki Doktorların Bireysel Muayene Sayıları
     static number_of_examination_for_internists_by_month() {
         return connection.execute(`
             SELECT
@@ -112,25 +114,25 @@ module.exports = class Doctor {
     }
 
     // Dahiliye Harici Doktorlarının Muayene Dağılımı
-    static distribution_of_examination_for_other_doctors() {
-        return connection.execute(`
-            SELECT 
-                department.id AS department_department_id,
-                department.name AS department_department_name,
-                doctor.id AS doctor_id,
-                CONCAT(doctor.name,' ',doctor.surname) as doctor_fullname,
-                (COUNT(CASE WHEN examination.directed_doctor1 = doctor.id THEN 1 END) + 
-                COUNT(CASE WHEN examination.directed_doctor2 = doctor.id THEN 1 END)) AS total_examinations
-            FROM doctor
-            LEFT JOIN department ON doctor.department_id = department.id
-            LEFT JOIN examination ON doctor.id IN (examination.directed_doctor1, examination.directed_doctor2)
-            WHERE department.id != 1
-            GROUP BY doctor.id
-            ORDER BY department.name, doctor.name
-        `);
-    }
+    // static distribution_of_examination_for_other_doctors() {
+    //     return connection.execute(`
+    //         SELECT
+    //             department.id AS department_department_id,
+    //             department.name AS department_department_name,
+    //             doctor.id AS doctor_id,
+    //             CONCAT(doctor.name,' ',doctor.surname) as doctor_fullname,
+    //             (COUNT(CASE WHEN examination.directed_doctor1 = doctor.id THEN 1 END) +
+    //             COUNT(CASE WHEN examination.directed_doctor2 = doctor.id THEN 1 END)) AS total_examinations
+    //         FROM doctor
+    //         LEFT JOIN department ON doctor.department_id = department.id
+    //         LEFT JOIN examination ON doctor.id IN (examination.directed_doctor1, examination.directed_doctor2)
+    //         WHERE department.id != 1
+    //         GROUP BY doctor.id
+    //         ORDER BY department.name, doctor.name
+    //     `);
+    // }
 
-    // Dahiliye Haricindeki Departmanların Muayene ve Hasılat Sayıları
+    // TODO| Dahiliye Haricindeki Departmanların Muayene ve Hasılat Sayıları
     static distribution_of_examination_and_revenue_for_other_departments() {
         return connection.execute(`
             SELECT 
@@ -155,6 +157,36 @@ module.exports = class Doctor {
                 GROUP BY doctor.id
             ) as subquery
             GROUP BY department_department_id
+            ORDER BY number_examination DESC
+        `);
+    }
+
+    // Tüm Departmanların Muayene ve Hasılat Sayıları
+    static distribution_of_examination_and_revenue_for_all_departments() {
+        return connection.execute(`
+            SELECT 
+                department_department_id,
+                department_department_name,
+                department_examination_price,
+                SUM(total_examinations) as number_examination,
+				(department_examination_price * SUM(total_examinations)) as total_revenue
+            FROM (
+                SELECT 
+                    department.id AS department_department_id,
+                    department.name AS department_department_name,
+                    department.examination_price AS department_examination_price,
+                    doctor.id AS doctor_id,
+                    CONCAT(doctor.name,' ',doctor.surname) as doctor_fullname,
+                    (COUNT(CASE WHEN examination.doctor_id = doctor.id THEN 1 END) + 
+                    COUNT(CASE WHEN examination.directed_doctor1 = doctor.id THEN 1 END) + 
+                    COUNT(CASE WHEN examination.directed_doctor2 = doctor.id THEN 1 END)) AS total_examinations
+                FROM doctor
+                LEFT JOIN department ON doctor.department_id = department.id
+                LEFT JOIN examination ON doctor.id IN (examination.doctor_id, examination.directed_doctor1, examination.directed_doctor2)
+                GROUP BY doctor.id
+            ) as subquery
+            GROUP BY department_department_id
+            ORDER BY total_revenue DESC
         `);
     }
 };

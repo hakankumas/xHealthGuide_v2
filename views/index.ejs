@@ -3,11 +3,9 @@
     <head>
         <!-- prettier-ignore -->
         <%- include('./_partials/_head'); %>
-        <%- include('./_partials/_cdn_datatables'); %>
         <%- include('./_partials/_cdn_googlecharts'); %>
         <%- include('./_partials/_cdn_fontawesome'); %>
         <!-- prettier-ignore -->
-        <%- include('./_partials/graphic/_index'); %>
         <script type="text/javascript">
             google.charts.load("current", { packages: ["corechart", "line"] });
             google.charts.setOnLoadCallback(drawBasic1);
@@ -15,6 +13,8 @@
             google.charts.setOnLoadCallback(drawBasic3);
             google.charts.setOnLoadCallback(drawBasic4);
             google.charts.setOnLoadCallback(drawBasic5);
+            google.charts.setOnLoadCallback(drawBasic6);
+            google.charts.setOnLoadCallback(drawBasic7);
 
             function drawBasic1() {
                 fetch(
@@ -60,9 +60,9 @@
                             },
                             chartArea: {
                                 top: 75,
-                                right: 200,
-                                bottom: 75,
-                                left: 150,
+                                right: 140,
+                                bottom: 130,
+                                left: 120,
                             },
                         };
 
@@ -78,6 +78,7 @@
                         );
                     });
             }
+
             function drawBasic2() {
                 fetch(
                     `<%= baseURL %>/api/number_of_examination_for_internists_by_month`
@@ -144,9 +145,9 @@
                             series: { [doctors.length]: { type: "line" } },
                             chartArea: {
                                 top: 75,
-                                right: 200,
-                                bottom: 75,
-                                left: 150,
+                                right: 170,
+                                bottom: 130,
+                                left: 120,
                             },
                         };
 
@@ -162,6 +163,7 @@
                         );
                     });
             }
+
             function drawBasic3() {
                 fetch(
                     `<%= baseURL %>/api/distribution_of_examination_by_internists`
@@ -208,11 +210,12 @@
                         );
                     });
             }
+            
             function drawBasic4() {
                 fetch(`<%= baseURL %>/api/distribution_of_doctors_by_gender`)
                     .then((response) => response.json())
                     .then((data) => {
-                        const chartData = [["Doktor Adı", "Cinsiyet"]];
+                        const chartData = [["Cinsiyet", "Yüzde"]];
 
                         data.distribution_of_doctors_by_gender.forEach(
                             (item) => {
@@ -249,6 +252,7 @@
                         );
                     });
             }
+            
             function drawBasic5() {
                 fetch(`<%= baseURL %>/api/total_revenue_by_record_date`)
                     .then((response) => {
@@ -260,7 +264,7 @@
                     .then((data) => {
                         var chartData = new google.visualization.DataTable();
                         chartData.addColumn("string", "Aylar");
-                        chartData.addColumn("number", "Elde Edilen Gelir (₺)");
+                        chartData.addColumn("number", "Elde Edilen Gelirler (₺)");
                         data.total_revenue_by_record_date.forEach((item) => {
                             chartData.addRow([
                                 new Intl.DateTimeFormat("tr-TR", {
@@ -285,14 +289,14 @@
                                 // slantedTextAngle: 90,
                             },
                             vAxis: {
-                                title: "Elde Edilen Gelir (₺)",
+                                title: "Elde Edilen Gelirler (₺)",
                                 format: "#",
                             },
                             chartArea: {
                                 top: 75,
-                                right: 200,
-                                bottom: 75,
-                                left: 150,
+                                right: 140,
+                                bottom: 130,
+                                left: 130,
                             },
                         };
 
@@ -308,6 +312,93 @@
                         );
                     });
             }
+
+            function drawBasic6() {
+                fetch(`<%= baseURL %>/api/sick_by_gender`)
+                    .then((response) => response.json())
+                    .then((data) => {
+                        const chartData = [["Cinsiyet", "Yüzde"]];
+
+                        data.sick_by_gender.forEach(
+                            (item) => {
+                                chartData.push([item.gender_name, item.number]);
+                            }
+                        );
+
+                        const dataTable =
+                            google.visualization.arrayToDataTable(chartData);
+
+                        const options = {
+                            titleTextStyle: {
+                                fontSize: 24,
+                                bold: true,
+                            },
+                            chartArea: {
+                                top: 85,
+                                right: 0,
+                                bottom: 0,
+                                left: 75,
+                            },
+                        };
+
+                        const chart = new google.visualization.PieChart(
+                            document.getElementById("chart_div6")
+                        );
+
+                        chart.draw(dataTable, options);
+                    })
+                    .catch((error) => {
+                        console.error(
+                            "API çağrısı sırasında bir hata oluştu:",
+                            error
+                        );
+                    });
+            }
+
+            function drawBasic7() {
+                fetch(`<%= baseURL %>/api/distribution_of_examination_and_revenue_for_other_departments`)
+                    .then((response) => response.json())
+                    .then((data) => {
+                        const chartData = [["Departman", "Yüzde"]];
+
+                        data.distribution_of_examination_and_revenue_for_other_departments.forEach(
+                            (item) => {
+                                chartData.push([item.department_department_name,
+                                parseInt(item.number_examination, 10),
+                                ]);
+                            }
+                        );
+
+                        const dataTable =
+                            google.visualization.arrayToDataTable(chartData);
+
+                        const options = {
+                            titleTextStyle: {
+                                fontSize: 24,
+                                bold: true,
+                            },
+                            chartArea: {
+                                top: 85,
+                                right: 0,
+                                bottom: 0,
+                                left: 75,
+                            },
+                        };
+
+                        const chart = new google.visualization.PieChart(
+                            document.getElementById("chart_div7")
+                        );
+
+                        chart.draw(dataTable, options);
+                    })
+                    .catch((error) => {
+                        console.error(
+                            "API çağrısı sırasında bir hata oluştu:",
+                            error
+                        );
+                    });
+            }
+            
         </script>
     </head>
     <body class="navbar-fixed sidebar-fixed" id="body">
@@ -319,7 +410,10 @@
                     <div class="content">
                         <div class="row">
                             <div class="col-xl-3 col-md-6">
-                                <div class="card card-default">
+                                <div
+                                    class="card card-default"
+                                    style="min-height: 85%"
+                                >
                                     <div class="d-flex p-5">
                                         <div
                                             class="icon-md bg-success rounded-circle mr-3"
@@ -330,15 +424,18 @@
                                         </div>
                                         <div class="text-left">
                                             <!-- prettier-ignore -->
-                                            <span class="h4 d-block">Toplam Hasılat</span>
+                                            <span class="h4 d-block mt-3" style="font-size: 20px;">Toplam Hasılat</span>
                                             <!-- prettier-ignore -->
-                                            <p class="h2"><%= Number(total_revenue[0].number).toLocaleString('tr-TR') %> ₺</p>
+                                            <p class="h2" style="font-weight: bold; font-size: 28px;"><%= Number(total_revenue[0].number).toLocaleString('tr-TR') %> ₺</p>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                             <div class="col-xl-3 col-md-6">
-                                <div class="card card-default">
+                                <div
+                                    class="card card-default"
+                                    style="min-height: 85%"
+                                >
                                     <div class="d-flex p-5">
                                         <div
                                             class="icon-md bg-secondary rounded-circle mr-3"
@@ -349,15 +446,18 @@
                                         </div>
                                         <div class="text-left">
                                             <!-- prettier-ignore -->
-                                            <span class="h4 d-block">Muayene</span>
+                                            <span class="h4 d-block mt-3">Muayene</span>
                                             <!-- prettier-ignore -->
-                                            <p class="h2"><%= total_examination[0].number %></p>
+                                            <p class="h2" style="font-weight: bold;"><%= total_examination[0].number %></p>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                             <div class="col-xl-3 col-md-6">
-                                <div class="card card-default">
+                                <div
+                                    class="card card-default"
+                                    style="min-height: 85%"
+                                >
                                     <div class="d-flex p-5">
                                         <div
                                             class="icon-md bg-info rounded-circle mr-3"
@@ -368,15 +468,18 @@
                                         </div>
                                         <div class="text-left">
                                             <!-- prettier-ignore -->
-                                            <span class="h4 d-block">Aktif Departman</span>
+                                            <span class="h4 d-block mt-3" style="font-size: 18px;">Aktif Departman</span>
                                             <!-- prettier-ignore -->
-                                            <p class="h2"><%= total_department[0].number %></p>
+                                            <p class="h2" style="font-weight: bold;"><%= total_department[0].number %></p>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                             <div class="col-xl-3 col-md-6">
-                                <div class="card card-default">
+                                <div
+                                    class="card card-default"
+                                    style="min-height: 85%"
+                                >
                                     <div class="d-flex p-5">
                                         <div
                                             class="icon-md bg-primary rounded-circle mr-3"
@@ -387,9 +490,9 @@
                                         </div>
                                         <div class="text-left">
                                             <!-- prettier-ignore -->
-                                            <span class="h4 d-block">Doktor</span>
+                                            <span class="h4 d-block mt-3">Doktor</span>
                                             <!-- prettier-ignore -->
-                                            <p class="h2"><%= total_doctor[0].number %></p>
+                                            <p class="h2" style="font-weight: bold;" style="font-weight: bold;" style="font-weight: bold;"><%= total_doctor[0].number %></p>
                                         </div>
                                     </div>
                                 </div>
@@ -522,6 +625,58 @@
                                             style="
                                                 min-width: 100%;
                                                 height: 60vh;
+                                            "
+                                        ></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-6 pb-4">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <h1
+                                            class="text-center py-3"
+                                            style="
+                                                font-size: 25px;
+                                                font-weight: bold;
+                                            "
+                                        >
+                                            <!-- prettier-ignore -->
+                                            <small><i>Hastaların</i><br /></small>
+                                            <!-- prettier-ignore -->
+                                            <span>Cinsiyet Dağılımı</span>
+                                        </h1>
+                                        <div
+                                            id="chart_div6"
+                                            style="
+                                                min-width: 100%;
+                                                height: 50vh;
+                                            "
+                                        ></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-6 pb-4">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <h1
+                                            class="text-center py-3"
+                                            style="
+                                                font-size: 25px;
+                                                font-weight: bold;
+                                            "
+                                        >
+                                            <!-- prettier-ignore -->
+                                            <small><i>Hastaların, Dahiliye Sonrasında</i><br /></small>
+                                            <!-- prettier-ignore -->
+                                            <span>Muayene Oldukları Departmanlar</span>
+                                        </h1>
+                                        <div
+                                            id="chart_div7"
+                                            style="
+                                                min-width: 100%;
+                                                height: 50vh;
                                             "
                                         ></div>
                                     </div>

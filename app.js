@@ -96,6 +96,40 @@ app.get("/api/distribution_of_doctors_by_gender", async (req, res) => {
     });
 });
 
+app.get("/api/sick_by_gender", async (req, res) => {
+    const sick_by_gender = await Sick.sick_by_gender();
+
+    res.status(200).json({
+        sick_by_gender: sick_by_gender[0],
+    });
+});
+
+app.get(
+    "/api/distribution_of_examination_and_revenue_for_other_departments",
+    async (req, res) => {
+        const distribution_of_examination_and_revenue_for_other_departments =
+            await Doctor.distribution_of_examination_and_revenue_for_other_departments();
+
+        res.status(200).json({
+            distribution_of_examination_and_revenue_for_other_departments:
+                distribution_of_examination_and_revenue_for_other_departments[0],
+        });
+    }
+);
+
+app.get(
+    "/api/distribution_of_examination_and_revenue_for_all_departments",
+    async (req, res) => {
+        const distribution_of_examination_and_revenue_for_all_departments =
+            await Doctor.distribution_of_examination_and_revenue_for_all_departments();
+
+        res.status(200).json({
+            distribution_of_examination_and_revenue_for_all_departments:
+                distribution_of_examination_and_revenue_for_all_departments[0],
+        });
+    }
+);
+
 const PORT = 3009;
 app.locals.baseURL = `http://localhost:${PORT}`;
 app.listen(PORT, () => {

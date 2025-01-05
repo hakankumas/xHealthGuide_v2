@@ -3,10 +3,101 @@
     <head>
         <!-- prettier-ignore -->
         <%- include('../_partials/_head'); %>
-        <%- include('../_partials/_cdn_datatables'); %>
         <%- include('../_partials/_cdn_googlecharts'); %>
         <%- include('../_partials/_cdn_fontawesome'); %>
         <!-- prettier-ignore -->
+        <script type="text/javascript">
+            google.charts.load("current", { packages: ["corechart", "line"] });
+            google.charts.setOnLoadCallback(drawBasic1);
+
+            function drawBasic1() {
+                fetch(
+                    `<%= baseURL %>/api/distribution_of_examination_for_other_doctors`
+                )
+                    .then((response) => {
+                        if (!response.ok) {
+                            throw new Error("Network response was not ok");
+                        }
+                        return response.json();
+                    })
+                    .then((data) => {
+                        const formattedData = {};
+
+                        // Veriyi departman ve doktor bazlı gruplandır
+                        data.distribution_of_examination_for_other_doctors.forEach((item) => {
+                            const { doctor_fullname, department_department_name, total_examination } = item;
+
+                            // Eğer departman daha önce eklenmemişse, boş bir nesne oluştur
+                            if (!formattedData[department_department_name]) {
+                                formattedData[department_department_name] = {};
+                            }
+
+                            // Doktor ve muayene sayısını ekle
+                            formattedData[department_department_name][doctor_fullname] = total_examination;
+                        });
+
+                        // Doktor isimlerini çıkar (tekil liste oluştur)
+                        const doctors = [
+                            ...new Set(
+                                data.distribution_of_examination_for_other_doctors.map(
+                                    (item) => item.doctor_fullname
+                                )
+                            ),
+                        ];
+
+                        // Grafik veri dizisini oluştur
+                        const chartDataArray = [["Department", ...doctors]];
+
+                        // Departman bazlı verileri diziye ekle
+                        for (const [department, doctorData] of Object.entries(formattedData)) {
+                            const row = [department];
+                            doctors.forEach((doctor) => {
+                                // Eğer doktor verisi varsa muayene sayısını, yoksa 0 değerini ekle
+                                row.push(doctorData[doctor] || 0);
+                            });
+                            chartDataArray.push(row);
+                        }              
+
+                        const chartData =
+                            google.visualization.arrayToDataTable(
+                                chartDataArray
+                            );
+
+                        const options = {
+                            titleTextStyle: {
+                                fontSize: 24,
+                                bold: true,
+                            },
+                            vAxis: { title: "Muayene Sayısı", format: "#" },
+                            hAxis: {
+                                title: "Tarih",
+                                // slantedText: true,
+                                // slantedTextAngle: 90,
+                            },
+                            seriesType: "bars",
+                            series: { [doctors.length]: { type: "line" } },
+                            chartArea: {
+                                top: 75,
+                                right: 170,
+                                bottom: 130,
+                                left: 120,
+                            },
+                        };
+
+                        const chart = new google.visualization.ComboChart(
+                            document.getElementById("chart_div1")
+                        );
+                        chart.draw(chartData, options);
+                    })
+                    .catch((error) => {
+                        console.error("Error fetching data:", error);
+                        alert(
+                            "Veri alınırken bir hata oluştu. Lütfen tekrar deneyin."
+                        );
+                    });
+            }
+
+        </script>
     </head>
     <body class="navbar-fixed sidebar-fixed" id="body">
         <div class="wrapper">
@@ -14,7 +105,35 @@
             <div class="page-wrapper">
                 <%- include('../_partials/_header') %>
                 <div class="content-wrapper">
-                    <div class="content"></div>
+                    <div class="content">
+                        <div class="row">
+                            <div class="col-lg-12 pb-4">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <h1
+                                            class="text-center py-3"
+                                            style="
+                                                font-size: 25px;
+                                                font-weight: bold;
+                                            "
+                                        >
+                                            <!-- prettier-ignore -->
+                                            <small><i>Dahiliye Departmanında</i><br /></small>
+                                            <!-- prettier-ignore -->
+                                            <span>Muayene Edilen Hasta Sayıları</span>
+                                        </h1>
+                                        <div
+                                            id="chart_div1"
+                                            style="
+                                                min-width: 100%;
+                                                height: 60vh;
+                                            "
+                                        ></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
                 <%- include('../_partials/_footer') %>
             </div>

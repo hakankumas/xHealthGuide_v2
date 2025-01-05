@@ -30,7 +30,7 @@ module.exports = class Sick {
         `);
     }
 
-    // Hastaların Cinsiyetlerine Göre Dağılımı
+    // TODO| Hastaların Cinsiyetlerine Göre Dağılımı
     static sick_by_gender() {
         return connection.execute(`
             SELECT
@@ -40,6 +40,7 @@ module.exports = class Sick {
             FROM sick
             INNER JOIN gender ON sick.gender_id = gender.id
             GROUP BY gender.id
+            ORDER BY number DESC
         `);
     }
 
@@ -155,7 +156,7 @@ module.exports = class Sick {
         `);
     }
 
-    // *TODO Tedaviye Başlanma Tarihine Göre Elde Edilen Gelirler
+    // TODO| Tedaviye Başlanma Tarihine Göre Elde Edilen Gelirler
     static total_revenue_by_record_date() {
         return connection.execute(`
             SELECT
