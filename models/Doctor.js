@@ -35,7 +35,7 @@ module.exports = class Doctor {
         `);
     }
 
-    // Doktorların Cinsiyetlerine Göre Dağılımı
+    // *TODO Doktorların Cinsiyetlerine Göre Dağılımı
     static distribution_of_doctors_by_gender() {
         return connection.execute(`
             SELECT
@@ -66,14 +66,12 @@ module.exports = class Doctor {
         `);
     }
 
-    // Dahiliye Doktorlarının Muayene Dağılımı
+    // *TODO Dahiliye Doktorlarının Muayene Dağılımı
     static distribution_of_examination_by_internists() {
         return connection.execute(`
             SELECT
                 doctor.id as doctor_id,
-                doctor.name as doctor_name,
-                doctor.surname as doctor_surname,
-
+                CONCAT(doctor.name,' ',doctor.surname) as doctor_fullname,
                 COUNT(examination.id) as number
             FROM examination
             INNER JOIN sick ON examination.sick_id = sick.id
@@ -82,7 +80,7 @@ module.exports = class Doctor {
         `);
     }
 
-    // Aylara Göre Dahiliye Departmanındaki Toplam Muayene Sayıları
+    // *TODO Aylara Göre Dahiliye Departmanındaki Toplam Muayene Sayıları
     static monthly_examination_numbers_of_all_internists() {
         return connection.execute(`
             SELECT
@@ -95,13 +93,12 @@ module.exports = class Doctor {
         `);
     }
 
-    // Aylara Göre Dahiliye Departmanındaki Doktorların Bireysel Muayene Sayıları
+    // *TODO Aylara Göre Dahiliye Departmanındaki Doktorların Bireysel Muayene Sayıları
     static number_of_examination_for_internists_by_month() {
         return connection.execute(`
             SELECT
                 doctor.id as doctor_id,
-                doctor.name as doctor_name,
-                doctor.surname as doctor_surname,
+                CONCAT(doctor.name,' ',doctor.surname) as doctor_fullname,
                             
                 MONTH(examination.record_date) as month,
                 COUNT(examination.id) as number
@@ -121,8 +118,7 @@ module.exports = class Doctor {
                 department.id AS department_department_id,
                 department.name AS department_department_name,
                 doctor.id AS doctor_id,
-                doctor.name AS doctor_name,
-                doctor.surname AS doctor_surname,
+                CONCAT(doctor.name,' ',doctor.surname) as doctor_fullname,
                 (COUNT(CASE WHEN examination.directed_doctor1 = doctor.id THEN 1 END) + 
                 COUNT(CASE WHEN examination.directed_doctor2 = doctor.id THEN 1 END)) AS total_examinations
             FROM doctor
@@ -131,6 +127,34 @@ module.exports = class Doctor {
             WHERE department.id != 1
             GROUP BY doctor.id
             ORDER BY department.name, doctor.name
+        `);
+    }
+
+    // Dahiliye Haricindeki Departmanların Muayene ve Hasılat Sayıları
+    static distribution_of_examination_and_revenue_for_other_departments() {
+        return connection.execute(`
+            SELECT 
+                department_department_id,
+                department_department_name,
+                department_examination_price,
+                SUM(total_examinations) as number_examination,
+                (department_examination_price * SUM(total_examinations)) as total_revenue
+            FROM (
+                SELECT 
+                    department.id AS department_department_id,
+                    department.name AS department_department_name,
+                    department.examination_price as department_examination_price,
+                    doctor.id AS doctor_id,
+                    CONCAT(doctor.name,' ',doctor.surname) as doctor_fullname,
+                    (COUNT(CASE WHEN examination.directed_doctor1 = doctor.id THEN 1 END) + 
+                    COUNT(CASE WHEN examination.directed_doctor2 = doctor.id THEN 1 END)) AS total_examinations
+                FROM doctor
+                LEFT JOIN department ON doctor.department_id = department.id
+                LEFT JOIN examination ON doctor.id IN (examination.directed_doctor1, examination.directed_doctor2)
+                WHERE department.id != 1
+                GROUP BY doctor.id
+            ) as subquery
+            GROUP BY department_department_id
         `);
     }
 };

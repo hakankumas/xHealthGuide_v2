@@ -154,4 +154,28 @@ module.exports = class Sick {
             LEFT JOIN department as department3 ON doctor3.department_id = department3.id;
         `);
     }
+
+    // *TODO Tedaviye Başlanma Tarihine Göre Elde Edilen Gelirler
+    static total_revenue_by_record_date() {
+        return connection.execute(`
+            SELECT
+                MONTH(examination.record_date) AS month,
+                SUM(ROUND(
+                    COALESCE(department1.examination_price, 0) + 
+                    COALESCE(department2.examination_price, 0) + 
+                    COALESCE(department3.examination_price, 0)
+                )) as number
+
+            FROM examination
+                INNER JOIN doctor as doctor1 ON examination.doctor_id = doctor1.id
+                INNER JOIN department as department1 ON doctor1.department_id = department1.id
+
+                LEFT JOIN doctor as doctor2 ON examination.directed_doctor1 = doctor2.id
+                LEFT JOIN department as department2 ON doctor2.department_id = department2.id
+
+                LEFT JOIN doctor as doctor3 ON examination.directed_doctor2 = doctor3.id 
+                LEFT JOIN department as department3 ON doctor3.department_id = department3.id
+            GROUP BY MONTH(examination.record_date)
+        `);
+    }
 };

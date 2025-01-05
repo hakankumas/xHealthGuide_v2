@@ -8,6 +8,9 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 const Count = require("./models/Count");
+const Doctor = require("./models/Doctor");
+const Sick = require("./models/Sick");
+
 app.get("/", async (req, res) => {
     const total_revenue = await Count.total_revenue();
     const total_examination = await Count.total_examination();
@@ -36,6 +39,60 @@ app.get("/doctor", async (req, res) => {
     res.render("./doctor/index", {
         title: "Doktorlar | Sağlık Rehberi KDS",
         activePage: "doctor",
+    });
+});
+
+app.get(
+    "/api/monthly_examination_numbers_of_all_internists",
+    async (req, res) => {
+        const monthly_examination_numbers_of_all_internists =
+            await Doctor.monthly_examination_numbers_of_all_internists();
+
+        res.status(200).json({
+            monthly_examination_numbers_of_all_internists:
+                monthly_examination_numbers_of_all_internists[0],
+        });
+    }
+);
+
+app.get(
+    "/api/number_of_examination_for_internists_by_month",
+    async (req, res) => {
+        const number_of_examination_for_internists_by_month =
+            await Doctor.number_of_examination_for_internists_by_month();
+
+        res.status(200).json({
+            number_of_examination_for_internists_by_month:
+                number_of_examination_for_internists_by_month[0],
+        });
+    }
+);
+
+app.get("/api/distribution_of_examination_by_internists", async (req, res) => {
+    const distribution_of_examination_by_internists =
+        await Doctor.distribution_of_examination_by_internists();
+
+    res.status(200).json({
+        distribution_of_examination_by_internists:
+            distribution_of_examination_by_internists[0],
+    });
+});
+
+app.get("/api/total_revenue_by_record_date", async (req, res) => {
+    const total_revenue_by_record_date =
+        await Sick.total_revenue_by_record_date();
+
+    res.status(200).json({
+        total_revenue_by_record_date: total_revenue_by_record_date[0],
+    });
+});
+
+app.get("/api/distribution_of_doctors_by_gender", async (req, res) => {
+    const distribution_of_doctors_by_gender =
+        await Doctor.distribution_of_doctors_by_gender();
+
+    res.status(200).json({
+        distribution_of_doctors_by_gender: distribution_of_doctors_by_gender[0],
     });
 });
 
