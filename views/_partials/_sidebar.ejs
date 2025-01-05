@@ -1,0 +1,34 @@
+<aside class="left-sidebar sidebar-dark" id="left-sidebar">
+    <div id="sidebar" class="sidebar sidebar-with-footer">
+        <div class="app-brand">
+            <a href="<%= baseURL %>/">
+                <img src="./logo.png" style="width: 50px" />
+                <span class="brand-name">Sağlık Rehberi</span>
+            </a>
+        </div>
+        <div class="sidebar-left" data-simplebar style="height: 100%">
+            <ul class="nav sidebar-inner" id="sidebar-menu">
+                <li class="<%= activePage === 'dashboard' ? 'active' : '' %>">
+                    <a class="sidenav-item-link" href="<%= baseURL %>/">
+                        <i class="mdi mdi-home-account"></i>
+                        <span class="nav-text">Dashboard</span>
+                    </a>
+                </li>
+
+                <!-- <li class="<%= activePage === 'chronic' ? 'active' : '' %>">
+                    <a class="sidenav-item-link" href="<%= baseURL %>/chronic">
+                        <i class="mdi mdi-alert-circle-outline"></i>
+                        <span class="nav-text">Kronik Hastalar</span>
+                    </a>
+                </li>
+
+                <li class="<%= activePage === 'datas' ? 'active' : '' %>">
+                    <a class="sidenav-item-link" href="<%= baseURL %>/datas">
+                        <i class="mdi mdi-account-group"></i>
+                        <span class="nav-text">Hasta Verileri</span>
+                    </a>
+                </li> -->
+            </ul>
+        </div>
+    </div>
+</aside>

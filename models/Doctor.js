@@ -1,0 +1,136 @@
+const connection = require("../database/db");
+
+module.exports = class Doctor {
+    /**
+     *!Source - Doktor Bilgileri
+     */
+    static getall() {
+        return connection.execute(`
+            SELECT 
+                doctor.id as doctor_id,
+                doctor.name as doctor_name,
+                doctor.surname as doctor_surname,
+                gender.id as gender_id,
+                gender.name as gender_name,
+                department.id as department_id,
+                department.name as department_name
+            FROM doctor
+                INNER JOIN gender ON doctor.gender_id = gender.id
+                INNER JOIN department ON doctor.department_id = department.id
+                ORDER BY department.id    
+        `);
+    }
+
+    // Departmanlardaki Doktor Sayıları
+    static number_of_doctors_in_departments() {
+        return connection.execute(`
+            SELECT
+                department.id as department_id,
+                department.name as department_name,
+                COUNT(doctor.id) as number
+            FROM doctor
+            INNER JOIN department ON doctor.department_id = department.id
+            GROUP BY department.id
+            ORDER BY number DESC
+        `);
+    }
+
+    // Doktorların Cinsiyetlerine Göre Dağılımı
+    static distribution_of_doctors_by_gender() {
+        return connection.execute(`
+            SELECT
+                gender.id as  gender_id,
+                gender.name as gender_name,
+                COUNT(doctor.id) as number
+            FROM doctor
+            INNER JOIN gender ON doctor.gender_id = gender.id
+            GROUP BY gender.id
+        `);
+    }
+
+    // Doktorların Departmanlarına Göre Cinsiyet Dağılımı
+    static distribution_of_doctors_by_gender_in_departments() {
+        return connection.execute(`
+            SELECT 
+                department.id AS department_id,
+                department.name AS department_name,
+                gender.id AS gender_id,
+                gender.name AS gender_name,
+                COUNT(doctor.id) AS number
+            FROM (SELECT DISTINCT department_id FROM doctor) AS active_departments
+            JOIN department ON department.id = active_departments.department_id
+            CROSS JOIN gender 
+            LEFT JOIN doctor ON doctor.department_id = department.id AND doctor.gender_id = gender.id
+            GROUP BY department.id, gender.id
+            ORDER BY department.id, gender.id
+        `);
+    }
+
+    // Dahiliye Doktorlarının Muayene Dağılımı
+    static distribution_of_examination_by_internists() {
+        return connection.execute(`
+            SELECT
+                doctor.id as doctor_id,
+                doctor.name as doctor_name,
+                doctor.surname as doctor_surname,
+
+                COUNT(examination.id) as number
+            FROM examination
+            INNER JOIN sick ON examination.sick_id = sick.id
+            INNER JOIN doctor ON examination.doctor_id = doctor.id
+            GROUP BY doctor.id
+        `);
+    }
+
+    // Aylara Göre Dahiliye Departmanındaki Toplam Muayene Sayıları
+    static monthly_examination_numbers_of_all_internists() {
+        return connection.execute(`
+            SELECT
+                MONTH(examination.record_date) as month,
+                COUNT(examination.id) as number
+            FROM examination
+            INNER JOIN sick ON examination.sick_id = sick.id
+            INNER JOIN doctor ON examination.doctor_id = doctor.id
+            GROUP BY MONTH(examination.record_date)
+        `);
+    }
+
+    // Aylara Göre Dahiliye Departmanındaki Doktorların Bireysel Muayene Sayıları
+    static number_of_examination_for_internists_by_month() {
+        return connection.execute(`
+            SELECT
+                doctor.id as doctor_id,
+                doctor.name as doctor_name,
+                doctor.surname as doctor_surname,
+                            
+                MONTH(examination.record_date) as month,
+                COUNT(examination.id) as number
+                
+            FROM examination
+                INNER JOIN doctor ON examination.doctor_id = doctor.id
+                INNER JOIN department ON doctor.department_id = department.id
+            GROUP BY doctor.id, MONTH(examination.record_date)
+            ORDER BY doctor.name ASC, MONTH(examination.record_date) ASC
+        `);
+    }
+
+    // Dahiliye Harici Doktorlarının Muayene Dağılımı
+    static distribution_of_examination_for_other_doctors() {
+        return connection.execute(`
+            SELECT 
+                department.id AS department_department_id,
+                department.name AS department_department_name,
+                doctor.id AS doctor_id,
+                doctor.name AS doctor_name,
+                doctor.surname AS doctor_surname,
+                (COUNT(CASE WHEN examination.directed_doctor1 = doctor.id THEN 1 END) + 
+                COUNT(CASE WHEN examination.directed_doctor2 = doctor.id THEN 1 END)) AS total_examinations
+            FROM doctor
+            LEFT JOIN department ON doctor.department_id = department.id
+            LEFT JOIN examination ON doctor.id IN (examination.directed_doctor1, examination.directed_doctor2)
+            WHERE department.id != 1
+            GROUP BY doctor.id
+            ORDER BY department.name, doctor.name
+        `);
+    }
+};
