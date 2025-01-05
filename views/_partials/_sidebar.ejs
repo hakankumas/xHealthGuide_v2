@@ -10,22 +10,25 @@
             <ul class="nav sidebar-inner" id="sidebar-menu">
                 <li class="<%= activePage === 'dashboard' ? 'active' : '' %>">
                     <a class="sidenav-item-link" href="<%= baseURL %>/">
-                        <i class="mdi mdi-home-account"></i>
+                        <i class="fa-solid fa-house"></i>
                         <span class="nav-text">Dashboard</span>
                     </a>
                 </li>
 
-                <li class="<%= activePage === 'chronic' ? 'active' : '' %>">
-                    <a class="sidenav-item-link" href="<%= baseURL %>/chronic">
-                        <i class="mdi mdi-alert-circle-outline"></i>
-                        <span class="nav-text">Kronik Hastalar</span>
+                <li class="<%= activePage === 'department' ? 'active' : '' %>">
+                    <a
+                        class="sidenav-item-link"
+                        href="<%= baseURL %>/department"
+                    >
+                        <i class="fa-solid fa-building"></i>
+                        <span class="nav-text">Departmanlar</span>
                     </a>
                 </li>
 
-                <li class="<%= activePage === 'datas' ? 'active' : '' %>">
-                    <a class="sidenav-item-link" href="<%= baseURL %>/datas">
-                        <i class="mdi mdi-account-group"></i>
-                        <span class="nav-text">Hasta Verileri</span>
+                <li class="<%= activePage === 'doctor' ? 'active' : '' %>">
+                    <a class="sidenav-item-link" href="<%= baseURL %>/doctor">
+                        <i class="fa-solid fa-user-doctor"></i>
+                        <span class="nav-text">Doktorlar</span>
                     </a>
                 </li>
             </ul>

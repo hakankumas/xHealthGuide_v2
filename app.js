@@ -25,6 +25,20 @@ app.get("/", async (req, res) => {
     });
 });
 
+app.get("/department", async (req, res) => {
+    res.render("./department/index", {
+        title: "Departmanlar | Sağlık Rehberi KDS",
+        activePage: "department",
+    });
+});
+
+app.get("/doctor", async (req, res) => {
+    res.render("./doctor/index", {
+        title: "Doktorlar | Sağlık Rehberi KDS",
+        activePage: "doctor",
+    });
+});
+
 const PORT = 3009;
 app.locals.baseURL = `http://localhost:${PORT}`;
 app.listen(PORT, () => {

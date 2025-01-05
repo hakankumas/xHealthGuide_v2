@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+    <head>
+        <!-- prettier-ignore -->
+        <%- include('../_partials/_head'); %>
+        <%- include('../_partials/_cdn_datatables'); %>
+        <%- include('../_partials/_cdn_googlecharts'); %>
+        <%- include('../_partials/_cdn_fontawesome'); %>
+        <!-- prettier-ignore -->
+    </head>
+    <body class="navbar-fixed sidebar-fixed" id="body">
+        <div class="wrapper">
+            <%- include('../_partials/_sidebar') %>
+            <div class="page-wrapper">
+                <%- include('../_partials/_header') %>
+                <div class="content-wrapper">
+                    <div class="content"></div>
+                </div>
+                <%- include('../_partials/_footer') %>
+            </div>
+        </div>
+        <%- include('../_partials/_scripts') %>
+    </body>
+</html>
