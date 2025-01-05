@@ -1,0 +1,77 @@
+<%- include('../_partials/_formatDate') %>
+
+<script type="text/javascript">
+    google.charts.load("current", { packages: ["line"] });
+    google.charts.setOnLoadCallback(drawChart);
+
+    function drawChart() {
+        fetch(`<%= baseURL %>/api/bpm`)
+            .then((response) => response.json())
+            .then((data) => {
+                var dataTable = new google.visualization.DataTable();
+                dataTable.addColumn("string", "Tarih");
+
+                const sickMap = new Map();
+                data.bpm.forEach((item) => {
+                    if (
+                        !sickMap.has(item.sick_name + " " + item.sick_surname)
+                    ) {
+                        sickMap.set(
+                            item.sick_name + " " + item.sick_surname,
+                            item.sick_name + " " + item.sick_surname
+                        );
+                        dataTable.addColumn(
+                            "number",
+                            item.sick_name + " " + item.sick_surname
+                        );
+                    }
+                });
+
+                const dateMap = new Map();
+                data.bpm.forEach((item) => {
+                    const formattedDate = formatDate(item.sick_bpm_date);
+                    if (!dateMap.has(formattedDate)) {
+                        dateMap.set(formattedDate, {});
+                    }
+                    dateMap.get(formattedDate)[
+                        item.sick_name + " " + item.sick_surname
+                    ] = parseFloat(item.sick_bpm_bpm);
+                });
+
+                const sortedDates = Array.from(dateMap.keys()).sort((a, b) => {
+                    const [dayA, monthA, yearA] = a.split("-").map(Number);
+                    const [dayB, monthB, yearB] = b.split("-").map(Number);
+                    return (
+                        new Date(`20${yearA}`, monthA - 1, dayA) -
+                        new Date(`20${yearB}`, monthB - 1, dayB)
+                    );
+                });
+
+                sortedDates.forEach((date) => {
+                    const patients = dateMap.get(date);
+                    const row = [date];
+                    sickMap.forEach((_, patient) => {
+                        row.push(patients[patient] || null);
+                    });
+                    dataTable.addRow(row);
+                });
+
+                var options = {
+                    hAxis: {
+                        title: "Tarih",
+                    },
+                    vAxis: {
+                        title: "Kalp Atış Hızı",
+                    },
+                };
+
+                var chart = new google.charts.Line(
+                    document.getElementById("chart_div2")
+                );
+                chart.draw(dataTable, options);
+            })
+            .catch((error) => {
+                console.error("API çağrısı sırasında bir hata oluştu:", error);
+            });
+    }
+</script>

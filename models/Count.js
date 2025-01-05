@@ -9,7 +9,7 @@ module.exports = class Count {
                  	COALESCE(department1.examination_price, 0) + 
                     COALESCE(department2.examination_price, 0) + 
                     COALESCE(department3.examination_price, 0)
-                 )) as total_revenue
+                 )) as number
 
             FROM examination
 
@@ -33,7 +33,7 @@ module.exports = class Count {
                 COUNT(examination.directed_doctor2) AS number3,
                 (COUNT(examination.doctor_id) + 
                 COUNT(examination.directed_doctor1) + 
-                COUNT(examination.directed_doctor2)) AS total_count
+                COUNT(examination.directed_doctor2)) AS number
             FROM examination
         `);
     }

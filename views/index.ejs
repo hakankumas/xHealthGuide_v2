@@ -5,6 +5,9 @@
         <%- include('./_partials/_head'); %>
         <%- include('./_partials/_cdn_datatables'); %>
         <%- include('./_partials/_cdn_googlecharts'); %>
+        <%- include('./_partials/_cdn_fontawesome'); %>
+        <!-- prettier-ignore -->
+        <%- include('./graphic/_index'); %>
     </head>
     <body class="navbar-fixed sidebar-fixed" id="body">
         <div class="wrapper">
@@ -12,11 +15,98 @@
             <div class="page-wrapper">
                 <%- include('./_partials/_header') %>
                 <div class="content-wrapper">
-                    <div class="content"></div>
+                    <div class="content">
+                        <div class="row">
+                            <div class="col-xl-3 col-md-6">
+                                <div class="card card-default">
+                                    <div class="d-flex p-5">
+                                        <div
+                                            class="icon-md bg-success rounded-circle mr-3"
+                                        >
+                                            <i
+                                                class="fa-solid fa-turkish-lira-sign"
+                                            ></i>
+                                        </div>
+                                        <div class="text-left">
+                                            <!-- prettier-ignore -->
+                                            <span class="h4 d-block">Toplam Hasılat</span>
+                                            <!-- prettier-ignore -->
+                                            <p class="h2"><%= Number(total_revenue[0].number).toLocaleString('tr-TR') %> ₺</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-xl-3 col-md-6">
+                                <div class="card card-default">
+                                    <div class="d-flex p-5">
+                                        <div
+                                            class="icon-md bg-secondary rounded-circle mr-3"
+                                        >
+                                            <i
+                                                class="fa-solid fa-magnifying-glass"
+                                            ></i>
+                                        </div>
+                                        <div class="text-left">
+                                            <!-- prettier-ignore -->
+                                            <span class="h4 d-block">Muayene</span>
+                                            <!-- prettier-ignore -->
+                                            <p class="h2"><%= total_examination[0].number %></p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-xl-3 col-md-6">
+                                <div class="card card-default">
+                                    <div class="d-flex p-5">
+                                        <div
+                                            class="icon-md bg-info rounded-circle mr-3"
+                                        >
+                                            <i
+                                                class="fa-solid fa-building-user"
+                                            ></i>
+                                        </div>
+                                        <div class="text-left">
+                                            <!-- prettier-ignore -->
+                                            <span class="h4 d-block">Aktif Departman</span>
+                                            <!-- prettier-ignore -->
+                                            <p class="h2"><%= total_department[0].number %></p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-xl-3 col-md-6">
+                                <div class="card card-default">
+                                    <div class="d-flex p-5">
+                                        <div
+                                            class="icon-md bg-primary rounded-circle mr-3"
+                                        >
+                                            <i
+                                                class="fa-solid fa-user-doctor"
+                                            ></i>
+                                        </div>
+                                        <div class="text-left">
+                                            <!-- prettier-ignore -->
+                                            <span class="h4 d-block">Doktor</span>
+                                            <!-- prettier-ignore -->
+                                            <p class="h2"><%= total_doctor[0].number %></p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
                 <%- include('./_partials/_footer') %>
             </div>
         </div>
         <%- include('./_partials/_scripts') %>
+        <script>
+            new DataTable("#table_sick", {
+                paging: false,
+                scrollCollapse: true,
+                scrollY: "75vh",
+                order: [[0, "desc"]],
+            });
+        </script>
     </body>
 </html>

@@ -1,0 +1,73 @@
+<script type="text/javascript">
+    google.charts.load("current", { packages: ["corechart"] });
+    google.charts.setOnLoadCallback(drawChart1);
+    google.charts.setOnLoadCallback(drawChart2);
+
+    function drawChart1() {
+        fetch(`<%= baseURL %>/api/distribution_of_chronic_sick`)
+            .then((response) => response.json())
+            .then((data) => {
+                const chartData = [["Kronik Hastalık", "Yüzde"]];
+
+                data.distribution_of_chronic_sick.forEach((item) => {
+                    chartData.push([item.chronic_name, parseInt(item.number)]);
+                });
+
+                const dataTable =
+                    google.visualization.arrayToDataTable(chartData);
+
+                const options = {
+                    chartArea: {
+                        top: 25,
+                        right: 25,
+                        bottom: 25,
+                        left: 75,
+                    },
+                };
+
+                const chart = new google.visualization.PieChart(
+                    document.getElementById("chart_div1")
+                );
+
+                chart.draw(dataTable, options);
+            })
+            .catch((error) => {
+                console.error("API çağrısı sırasında bir hata oluştu:", error);
+            });
+    }
+    function drawChart2() {
+        fetch(`<%= baseURL %>/api/gender_distribution_of_chronic_sick`)
+            .then((response) => response.json())
+            .then((data) => {
+                const chartData = [["Kronik Hastalık - Cinsiyet", "Yüzde"]];
+
+                data.gender_distribution_of_chronic_sick.forEach((item) => {
+                    chartData.push([
+                        item.chronic_name + " - " + item.gender_name,
+                        parseInt(item.number),
+                    ]);
+                });
+
+                const dataTable =
+                    google.visualization.arrayToDataTable(chartData);
+
+                const options = {
+                    chartArea: {
+                        top: 25,
+                        right: 25,
+                        bottom: 25,
+                        left: 75,
+                    },
+                };
+
+                const chart = new google.visualization.PieChart(
+                    document.getElementById("chart_div2")
+                );
+
+                chart.draw(dataTable, options);
+            })
+            .catch((error) => {
+                console.error("API çağrısı sırasında bir hata oluştu:", error);
+            });
+    }
+</script>

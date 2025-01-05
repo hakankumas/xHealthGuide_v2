@@ -1,0 +1,122 @@
+<script type="text/javascript">
+    google.charts.load("current", { packages: ["corechart"] });
+    google.charts.setOnLoadCallback(fetchDataAndDrawChart);
+    google.charts.setOnLoadCallback(drawChart1);
+    google.charts.setOnLoadCallback(drawChart2);
+
+    async function fetchDataAndDrawChart() {
+        try {
+            const response = await fetch(`<%= baseURL %>/api/sick_bmi`);
+            const result = await response.json();
+
+            const chartData = [["Hasta Adı", "BMI", { role: "style" }]];
+            result.sick_bmi.forEach((item) => {
+                const color = generateColor();
+                chartData.push([
+                    item.sick_fullname,
+                    parseFloat(item.sick_bmi),
+                    color,
+                ]);
+            });
+
+            const data = google.visualization.arrayToDataTable(chartData);
+
+            const options = {
+                hAxis: {
+                    title: "Hasta Bilgisi",
+                },
+                vAxis: {
+                    title: "BMI Değeri",
+                },
+                legend: { position: "none" },
+                chartArea: {
+                    top: 40,
+                    bottom: 120,
+                },
+            };
+
+            const chart = new google.visualization.ColumnChart(
+                document.getElementById("chart_div")
+            );
+
+            chart.draw(data, options);
+        } catch (error) {
+            console.error("Veri çekilirken hata oluştu:", error);
+        }
+    }
+
+    // Rastgele renk oluşturma fonksiyonu
+    function generateColor() {
+        const letters = "0123456789ABCDEF";
+        let color = "#";
+        for (let i = 0; i < 6; i++) {
+            color += letters[Math.floor(Math.random() * 16)];
+        }
+        return color;
+    }
+
+    function drawChart1() {
+        fetch(`<%= baseURL %>/api/number_of_sick_by_age`)
+            .then((response) => response.json())
+            .then((data) => {
+                const chartData = [["Yaş", "Yüzde"]];
+
+                data.number_of_sick_by_age.forEach((item) => {
+                    chartData.push([item.sick_age + " yaşında", item.number]);
+                });
+
+                const dataTable =
+                    google.visualization.arrayToDataTable(chartData);
+
+                const options = {
+                    chartArea: {
+                        top: 25,
+                        right: 25,
+                        bottom: 25,
+                        left: 75,
+                    },
+                };
+
+                const chart = new google.visualization.PieChart(
+                    document.getElementById("chart_div2")
+                );
+
+                chart.draw(dataTable, options);
+            })
+            .catch((error) => {
+                console.error("API çağrısı sırasında bir hata oluştu:", error);
+            });
+    }
+    function drawChart2() {
+        fetch(`<%= baseURL %>/api/number_of_sick_by_gender`)
+            .then((response) => response.json())
+            .then((data) => {
+                const chartData = [["Cinsiyet", "Yüzde"]];
+
+                data.number_of_sick_by_gender.forEach((item) => {
+                    chartData.push([item.gender_name, item.number]);
+                });
+
+                const dataTable =
+                    google.visualization.arrayToDataTable(chartData);
+
+                const options = {
+                    chartArea: {
+                        top: 25,
+                        right: 25,
+                        bottom: 25,
+                        left: 75,
+                    },
+                };
+
+                const chart = new google.visualization.PieChart(
+                    document.getElementById("chart_div3")
+                );
+
+                chart.draw(dataTable, options);
+            })
+            .catch((error) => {
+                console.error("API çağrısı sırasında bir hata oluştu:", error);
+            });
+    }
+</script>

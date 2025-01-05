@@ -7,10 +7,23 @@ app.use(express.static("public"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-const homeRoutes = require("./routes/home");
-const apiRoutes = require("./routes/api");
-app.use(homeRoutes);
-app.use("/api", apiRoutes);
+const Count = require("./models/Count");
+app.get("/", async (req, res) => {
+    const total_revenue = await Count.total_revenue();
+    const total_examination = await Count.total_examination();
+    const total_department = await Count.total_department();
+    const total_doctor = await Count.total_doctor();
+
+    res.render("index", {
+        title: "Ana Sayfa | Sağlık Rehberi KDS",
+        activePage: "dashboard",
+
+        total_revenue: total_revenue[0],
+        total_examination: total_examination[0],
+        total_department: total_department[0],
+        total_doctor: total_doctor[0],
+    });
+});
 
 const PORT = 3009;
 app.locals.baseURL = `http://localhost:${PORT}`;

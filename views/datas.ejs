@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+    <head>
+        <!-- prettier-ignore -->
+        <%- include('./_partials/_head'); %>
+        <%- include('./_partials/_cdn_datatables'); %>
+        <%- include('./_partials/_cdn_googlecharts'); %>
+        <!-- prettier-ignore -->
+        <%- include('./graphic/bloodpressure'); %>
+        <%- include('./graphic/bpm'); %>
+        <%- include('./graphic/cholesterol'); %>
+        <%- include('./graphic/fat'); %>
+        <%- include('./graphic/metabolicrate'); %>
+        <%- include('./graphic/step'); %>
+        <%- include('./graphic/waistline'); %>
+        <%- include('./graphic/weight'); %>
+    </head>
+    <body class="navbar-fixed sidebar-fixed" id="body">
+        <div class="wrapper">
+            <%- include('_partials/_sidebar') %>
+            <div class="page-wrapper">
+                <%- include('./_partials/_header') %>
+                <div class="content-wrapper">
+                    <div class="content">
+                        <div class="row">
+                            <div class="col-lg-12" style="translate: 0 -20px">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <!-- prettier-ignore -->
+                                        <h1
+                                            class="text-center pb-3"
+                                            style="
+                                                font-size: 25px;
+                                                font-weight: bold;
+                                            "
+                                        >
+                                            Veri Ekleme Formu
+                                        </h1>
+                                        <form
+                                            action="<%= baseURL %>/sick/create_data"
+                                            method="post"
+                                        >
+                                            <div class="form-group">
+                                                <label for="sick_id"
+                                                    >Hasta Adı</label
+                                                >
+                                                <select
+                                                    class="form-control"
+                                                    id="sick_id"
+                                                    name="sick_id"
+                                                    required
+                                                >
+                                                    <option value=""></option>
+                                                    <!-- prettier-ignore -->
+                                                    <% list_sick.forEach(item => { %>
+                                                    <!-- prettier-ignore -->
+                                                    <option value="<%= item.sick_id %>">
+                                                        <%= `${item.sick_name} ${item.sick_surname}` %>
+                                                    </option>
+                                                    <% }) %>
+                                                </select>
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label for="parameter_type"
+                                                    >Parametre Türü</label
+                                                >
+                                                <select
+                                                    class="form-control"
+                                                    id="parameter_type"
+                                                    name="parameter_type"
+                                                    required
+                                                >
+                                                    <option value=""></option>
+                                                    <option value="weight">
+                                                        Kilo
+                                                    </option>
+                                                    <option value="waistline">
+                                                        Bel Ölçüsü
+                                                    </option>
+                                                    <option value="step">
+                                                        Adım Sayısı
+                                                    </option>
+                                                    <option
+                                                        value="metabolicrate"
+                                                    >
+                                                        Metabolik Hız
+                                                    </option>
+                                                    <option
+                                                        value="bloodpressure"
+                                                    >
+                                                        Tansiyon
+                                                    </option>
+                                                    <option value="bpm">
+                                                        Kalp Atış Hızı
+                                                    </option>
+                                                    <option value="cholesterol">
+                                                        Kolesterol
+                                                    </option>
+                                                    <option value="fat">
+                                                        Vücut Yağ Oranı
+                                                    </option>
+                                                </select>
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label for="process_date"
+                                                    >Tarih</label
+                                                >
+                                                <input
+                                                    id="process_date"
+                                                    name="process_date"
+                                                    class="form-control"
+                                                    type="date"
+                                                />
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label for="value"
+                                                    >İşlem Değeri</label
+                                                >
+                                                <input
+                                                    id="value"
+                                                    name="value"
+                                                    class="form-control"
+                                                    type="text"
+                                                />
+                                            </div>
+
+                                            <div class="form-group">
+                                                <button
+                                                    type="submit"
+                                                    class="btn btn-lg btn-success"
+                                                >
+                                                    Ekle
+                                                </button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-lg-12 pb-4">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <h1
+                                            class="text-center py-3"
+                                            style="
+                                                font-size: 25px;
+                                                font-weight: bold;
+                                            "
+                                        >
+                                            Kilo <small>(Aylık)</small>
+                                        </h1>
+                                        <div
+                                            id="chart_div8"
+                                            style="
+                                                min-width: 100%;
+                                                height: 50vh;
+                                            "
+                                        ></div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-lg-12 pb-4">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <h1
+                                            class="text-center py-3"
+                                            style="
+                                                font-size: 25px;
+                                                font-weight: bold;
+                                            "
+                                        >
+                                            Bel Ölçüsü <small>(Aylık)</small>
+                                        </h1>
+                                        <div
+                                            id="chart_div7"
+                                            style="
+                                                min-width: 100%;
+                                                height: 50vh;
+                                            "
+                                        ></div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-lg-12 pb-4">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <h1
+                                            class="text-center py-3"
+                                            style="
+                                                font-size: 25px;
+                                                font-weight: bold;
+                                            "
+                                        >
+                                            Adım Sayısı <small>(Günlük)</small>
+                                        </h1>
+                                        <div
+                                            id="chart_div6"
+                                            style="
+                                                min-width: 100%;
+                                                height: 50vh;
+                                            "
+                                        ></div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-lg-12 pb-4">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <h1
+                                            class="text-center py-3"
+                                            style="
+                                                font-size: 25px;
+                                                font-weight: bold;
+                                            "
+                                        >
+                                            Metabolik Hız <small>(Aylık)</small>
+                                        </h1>
+                                        <div
+                                            id="chart_div5"
+                                            style="
+                                                min-width: 100%;
+                                                height: 50vh;
+                                            "
+                                        ></div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-lg-12 pb-4">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <h1
+                                            class="text-center py-3"
+                                            style="
+                                                font-size: 25px;
+                                                font-weight: bold;
+                                            "
+                                        >
+                                            Tansiyon <small>(Günlük)</small>
+                                        </h1>
+                                        <div
+                                            id="chart_div1"
+                                            style="
+                                                min-width: 100%;
+                                                height: 50vh;
+                                            "
+                                        ></div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-lg-12 pb-4">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <h1
+                                            class="text-center py-3"
+                                            style="
+                                                font-size: 25px;
+                                                font-weight: bold;
+                                            "
+                                        >
+                                            Kalp Atış Hızı
+                                            <small>(Günlük)</small>
+                                        </h1>
+                                        <div
+                                            id="chart_div2"
+                                            style="
+                                                min-width: 100%;
+                                                height: 50vh;
+                                            "
+                                        ></div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-lg-12 pb-4">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <h1
+                                            class="text-center py-3"
+                                            style="
+                                                font-size: 25px;
+                                                font-weight: bold;
+                                            "
+                                        >
+                                            Kolesterol <small>(Günlük)</small>
+                                        </h1>
+                                        <div
+                                            id="chart_div3"
+                                            style="
+                                                min-width: 100%;
+                                                height: 50vh;
+                                            "
+                                        ></div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-lg-12 pb-4">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <h1
+                                            class="text-center py-3"
+                                            style="
+                                                font-size: 25px;
+                                                font-weight: bold;
+                                            "
+                                        >
+                                            Vücut Yağ Oranı
+                                            <small>(Aylık)</small>
+                                        </h1>
+                                        <div
+                                            id="chart_div4"
+                                            style="
+                                                min-width: 100%;
+                                                height: 50vh;
+                                            "
+                                        ></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <%- include('./_partials/_footer') %>
+            </div>
+        </div>
+        <%- include('./_partials/_scripts') %>
+    </body>
+</html>
