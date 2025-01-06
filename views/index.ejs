@@ -212,14 +212,14 @@
             }
             
             function drawBasic4() {
-                fetch(`<%= baseURL %>/api/distribution_of_doctors_by_gender`)
+                fetch(`<%= baseURL %>/api/number_of_doctors_in_departments`)
                     .then((response) => response.json())
                     .then((data) => {
-                        const chartData = [["Cinsiyet", "Yüzde"]];
+                        const chartData = [["Departman", "Yüzde"]];
 
-                        data.distribution_of_doctors_by_gender.forEach(
+                        data.number_of_doctors_in_departments.forEach(
                             (item) => {
-                                chartData.push([item.gender_name, item.number]);
+                                chartData.push([item.department_name, item.number]);
                             }
                         );
 
@@ -643,9 +643,9 @@
                                             "
                                         >
                                             <!-- prettier-ignore -->
-                                            <small><i>Doktorların</i><br /></small>
+                                            <small><i>Personellerin</i><br /></small>
                                             <!-- prettier-ignore -->
-                                            <span>Cinsiyet Dağılımı</span>
+                                            <span>Departman Dağılımı</span>
                                         </h1>
                                         <div
                                             id="chart_div4"

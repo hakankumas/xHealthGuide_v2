@@ -87,12 +87,12 @@ app.get("/api/total_revenue_by_record_date", async (req, res) => {
     });
 });
 
-app.get("/api/distribution_of_doctors_by_gender", async (req, res) => {
-    const distribution_of_doctors_by_gender =
-        await Doctor.distribution_of_doctors_by_gender();
+app.get("/api/number_of_doctors_in_departments", async (req, res) => {
+    const number_of_doctors_in_departments =
+        await Doctor.number_of_doctors_in_departments();
 
     res.status(200).json({
-        distribution_of_doctors_by_gender: distribution_of_doctors_by_gender[0],
+        number_of_doctors_in_departments: number_of_doctors_in_departments[0],
     });
 });
 

@@ -21,7 +21,7 @@ module.exports = class Doctor {
         `);
     }
 
-    // Departmanlardaki Doktor Sayıları
+    // TODO| Departmanlardaki Doktor Sayıları
     static number_of_doctors_in_departments() {
         return connection.execute(`
             SELECT
@@ -32,38 +32,6 @@ module.exports = class Doctor {
             INNER JOIN department ON doctor.department_id = department.id
             GROUP BY department.id
             ORDER BY number DESC
-        `);
-    }
-
-    // TODO| Doktorların Cinsiyetlerine Göre Dağılımı
-    static distribution_of_doctors_by_gender() {
-        return connection.execute(`
-            SELECT
-                gender.id as  gender_id,
-                gender.name as gender_name,
-                COUNT(doctor.id) as number
-            FROM doctor
-            INNER JOIN gender ON doctor.gender_id = gender.id
-            GROUP BY gender.id
-            ORDER BY number DESC
-        `);
-    }
-
-    // Doktorların Departmanlarına Göre Cinsiyet Dağılımı
-    static distribution_of_doctors_by_gender_in_departments() {
-        return connection.execute(`
-            SELECT 
-                department.id AS department_id,
-                department.name AS department_name,
-                gender.id AS gender_id,
-                gender.name AS gender_name,
-                COUNT(doctor.id) AS number
-            FROM (SELECT DISTINCT department_id FROM doctor) AS active_departments
-            JOIN department ON department.id = active_departments.department_id
-            CROSS JOIN gender 
-            LEFT JOIN doctor ON doctor.department_id = department.id AND doctor.gender_id = gender.id
-            GROUP BY department.id, gender.id
-            ORDER BY department.id, gender.id
         `);
     }
 
@@ -186,11 +154,11 @@ module.exports = class Doctor {
                 GROUP BY doctor.id
             ) as subquery
             GROUP BY department_department_id
-            ORDER BY total_revenue DESC
+            ORDER BY total_examinations DESC
         `);
     }
 
-    // Tüm Departmanların Doktor Başına Hasta Sayıları
+    // TODO| Tüm Departmanların Doktor Başına Hasta Sayıları
     static numbers_of_sicks_for_all_departments_by_doctor() {
         return connection.execute(`
             SELECT 
@@ -224,6 +192,7 @@ module.exports = class Doctor {
             ) as subquery2
             WHERE subquery1.department_department_id = subquery2.department_id
             GROUP BY department_department_id
+            ORDER BY rate DESC
         `);
     }
 };
