@@ -130,6 +130,19 @@ app.get(
     }
 );
 
+app.get(
+    "/api/numbers_of_sicks_for_all_departments_by_doctor",
+    async (req, res) => {
+        const numbers_of_sicks_for_all_departments_by_doctor =
+            await Doctor.numbers_of_sicks_for_all_departments_by_doctor();
+
+        res.status(200).json({
+            numbers_of_sicks_for_all_departments_by_doctor:
+                numbers_of_sicks_for_all_departments_by_doctor[0],
+        });
+    }
+);
+
 const PORT = 3009;
 app.locals.baseURL = `http://localhost:${PORT}`;
 app.listen(PORT, () => {

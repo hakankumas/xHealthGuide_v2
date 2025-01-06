@@ -9,6 +9,8 @@
         <script type="text/javascript">
             google.charts.load("current", { packages: ["corechart"] });
             google.charts.setOnLoadCallback(drawChart1);
+            google.charts.setOnLoadCallback(drawChart2);
+            google.charts.setOnLoadCallback(drawChart3);
 
             async function drawChart1() {
                 try {
@@ -59,6 +61,104 @@
                 }
             }
 
+            async function drawChart2() {
+                try {
+                    const response = await fetch(
+                        `<%= baseURL %>/api/distribution_of_examination_and_revenue_for_all_departments`
+                    );
+                    const result = await response.json();
+
+                    const chartData = [
+                        ["Departmanlar", "Muayene Sayısı", { role: "style" }],
+                    ];
+                    result.distribution_of_examination_and_revenue_for_all_departments.forEach((item) => {
+                        const color = generateColor();
+                        chartData.push([
+                            item.department_department_name,
+                            parseInt(item.number_examination, 10),
+                            color,
+                        ]);
+                    });
+
+                    const data =
+                        google.visualization.arrayToDataTable(chartData);
+
+                    const options = {
+                        hAxis: {
+                            title: "Departmanlar",
+                        },
+                        vAxis: {
+                            title: "Muayene Sayısı",
+                            format: "decimal",
+                        },
+                        legend: { position: "none" },
+                        chartArea: {
+                            top: 75,
+                            right: 75,
+                            bottom: 130,
+                            left: 200,
+                        },
+                    };
+
+                    const chart = new google.visualization.ColumnChart(
+                        document.getElementById("chart_div2")
+                    );
+
+                    chart.draw(data, options);
+                } catch (error) {
+                    console.error("Veri çekilirken hata oluştu:", error);
+                }
+            }
+
+            async function drawChart3() {
+                try {
+                    const response = await fetch(
+                        `<%= baseURL %>/api/numbers_of_sicks_for_all_departments_by_doctor`
+                    );
+                    const result = await response.json();
+
+                    const chartData = [
+                        ["Departmanlar", "Muayene Sayısı", { role: "style" }],
+                    ];
+                    result.numbers_of_sicks_for_all_departments_by_doctor.forEach((item) => {
+                        const color = generateColor();
+                        chartData.push([
+                            item.department_department_name,
+                            parseFloat(item.rate),
+                            color,
+                        ]);
+                    });
+
+                    const data =
+                        google.visualization.arrayToDataTable(chartData);
+
+                    const options = {
+                        hAxis: {
+                            title: "Departmanlar",
+                        },
+                        vAxis: {
+                            title: "Muayene Sayısı",
+                            format: "decimal",
+                        },
+                        legend: { position: "none" },
+                        chartArea: {
+                            top: 75,
+                            right: 75,
+                            bottom: 130,
+                            left: 200,
+                        },
+                    };
+
+                    const chart = new google.visualization.ColumnChart(
+                        document.getElementById("chart_div3")
+                    );
+
+                    chart.draw(data, options);
+                } catch (error) {
+                    console.error("Veri çekilirken hata oluştu:", error);
+                }
+            }
+
             // Rastgele renk oluşturma fonksiyonu
             function generateColor() {
                 const letters = "0123456789ABCDEF";
@@ -95,6 +195,60 @@
                                         </h1>
                                         <div
                                             id="chart_div1"
+                                            style="
+                                                min-width: 100%;
+                                                height: 60vh;
+                                            "
+                                        ></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-12 pb-4">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <h1
+                                            class="text-center py-3"
+                                            style="
+                                                font-size: 25px;
+                                                font-weight: bold;
+                                            "
+                                        >
+                                            <!-- prettier-ignore -->
+                                            <small><i>Departmanlara Göre</i><br /></small>
+                                            <!-- prettier-ignore -->
+                                            <span>Muayene Sayıları</span>
+                                        </h1>
+                                        <div
+                                            id="chart_div2"
+                                            style="
+                                                min-width: 100%;
+                                                height: 60vh;
+                                            "
+                                        ></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-12 pb-4">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <h1
+                                            class="text-center py-3"
+                                            style="
+                                                font-size: 25px;
+                                                font-weight: bold;
+                                            "
+                                        >
+                                            <!-- prettier-ignore -->
+                                            <small><i>Departmanlara Göre</i><br /></small>
+                                            <!-- prettier-ignore -->
+                                            <span>Doktor Başına Düşen Hasta Sayısı</span>
+                                        </h1>
+                                        <div
+                                            id="chart_div3"
                                             style="
                                                 min-width: 100%;
                                                 height: 60vh;
