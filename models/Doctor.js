@@ -154,7 +154,7 @@ module.exports = class Doctor {
                 GROUP BY doctor.id
             ) as subquery
             GROUP BY department_department_id
-            ORDER BY total_examinations DESC
+            ORDER BY total_revenue DESC
         `);
     }
 

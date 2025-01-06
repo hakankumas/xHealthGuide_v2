@@ -10,6 +10,7 @@ app.use(express.urlencoded({ extended: true }));
 const Count = require("./models/Count");
 const Doctor = require("./models/Doctor");
 const Sick = require("./models/Sick");
+const Loses = require("./models/Loses");
 
 app.get("/", async (req, res) => {
     const total_revenue = await Count.total_revenue();
@@ -35,10 +36,10 @@ app.get("/department", async (req, res) => {
     });
 });
 
-app.get("/doctor", async (req, res) => {
-    res.render("./doctor/index", {
-        title: "Doktorlar | Sağlık Rehberi KDS",
-        activePage: "doctor",
+app.get("/cost", async (req, res) => {
+    res.render("./cost/index", {
+        title: "Kayıp Kazançlar | Sağlık Rehberi KDS",
+        activePage: "cost",
     });
 });
 
@@ -139,6 +140,58 @@ app.get(
         res.status(200).json({
             numbers_of_sicks_for_all_departments_by_doctor:
                 numbers_of_sicks_for_all_departments_by_doctor[0],
+        });
+    }
+);
+
+app.get(
+    "/api/numbers_of_examinations_for_unavailable_departments",
+    async (req, res) => {
+        const numbers_of_examinations_for_unavailable_departments =
+            await Loses.numbers_of_examinations_for_unavailable_departments();
+
+        res.status(200).json({
+            numbers_of_examinations_for_unavailable_departments:
+                numbers_of_examinations_for_unavailable_departments[0],
+        });
+    }
+);
+
+app.get(
+    "/api/revenues_of_examinations_for_unavailable_departments",
+    async (req, res) => {
+        const revenues_of_examinations_for_unavailable_departments =
+            await Loses.revenues_of_examinations_for_unavailable_departments();
+
+        res.status(200).json({
+            revenues_of_examinations_for_unavailable_departments:
+                revenues_of_examinations_for_unavailable_departments[0],
+        });
+    }
+);
+
+app.get(
+    "/api/numbers_of_examinations_for_unavailable_departments_by_month",
+    async (req, res) => {
+        const numbers_of_examinations_for_unavailable_departments_by_month =
+            await Loses.numbers_of_examinations_for_unavailable_departments_by_month();
+
+        res.status(200).json({
+            numbers_of_examinations_for_unavailable_departments_by_month:
+                numbers_of_examinations_for_unavailable_departments_by_month[0],
+        });
+    }
+);
+
+app.get(
+    "/api/numbers_of_examinations_for_unavailable_departments_by_month_by_department",
+    async (req, res) => {
+        const numbers_of_examinations_for_unavailable_departments_by_month_by_department =
+            await Loses.numbers_of_examinations_for_unavailable_departments_by_month_by_department();
+
+        res.status(200).json({
+            numbers_of_examinations_for_unavailable_departments_by_month_by_department:
+                numbers_of_examinations_for_unavailable_departments_by_month_by_department[0],
         });
     }
 );

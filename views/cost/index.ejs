@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+    <head>
+        <!-- prettier-ignore -->
+        <%- include('../_partials/_head'); %>
+        <%- include('../_partials/_cdn_googlecharts'); %>
+        <%- include('../_partials/_cdn_fontawesome'); %>
+        <!-- prettier-ignore -->
+        <script type="text/javascript">
+            google.charts.load("current", { packages: ["corechart", "line"] });
+            google.charts.setOnLoadCallback(drawChart1);
+            google.charts.setOnLoadCallback(drawChart2);
+            google.charts.setOnLoadCallback(drawChart3);
+            google.charts.setOnLoadCallback(drawChart4);
+
+            function drawChart1() {
+                fetch(
+                    `<%= baseURL %>/api/numbers_of_examinations_for_unavailable_departments_by_month`
+                )
+                    .then((response) => {
+                        if (!response.ok) {
+                            throw new Error("Network response was not ok");
+                        }
+                        return response.json();
+                    })
+                    .then((data) => {
+                        var chartData = new google.visualization.DataTable();
+                        chartData.addColumn("string", "Aylar");
+                        chartData.addColumn("number", "Yönlendirme Sayısı");
+                        data.numbers_of_examinations_for_unavailable_departments_by_month.forEach(
+                            (item) => {
+                                chartData.addRow([
+                                    new Intl.DateTimeFormat("tr-TR", {
+                                        month: "long",
+                                    }).format(new Date(2024, item.month - 1)),
+                                    item.number,
+                                ]);
+                            }
+                        );
+
+                        var options = {
+                            titleTextStyle: {
+                                fontSize: 24,
+                                bold: true,
+                            },
+                            // curveType: "function",
+                            // legend: { position: "bottom" },
+                            hAxis: {
+                                title: "Aylar",
+                                // format: "M/d/yy",
+                                // slantedText: true,
+                                // slantedTextAngle: 90,
+                            },
+                            vAxis: {
+                                title: "Yönlendirme Sayısı",
+                                format: "#",
+                            },
+                            chartArea: {
+                                top: 75,
+                                right: 150,
+                                bottom: 120,
+                                left: 100,
+                            },
+                        };
+
+                        var chart = new google.visualization.LineChart(
+                            document.getElementById("chart_div1")
+                        );
+                        chart.draw(chartData, options);
+                    })
+                    .catch((error) => {
+                        console.error("Error fetching data:", error);
+                        alert(
+                            "Veri alınırken bir hata oluştu. Lütfen tekrar deneyin."
+                        );
+                    });
+            }
+
+            function drawChart2() {
+                fetch(
+                    `<%= baseURL %>/api/numbers_of_examinations_for_unavailable_departments_by_month_by_department`
+                )
+                    .then((response) => {
+                        if (!response.ok) {
+                            throw new Error("Network response was not ok");
+                        }
+                        return response.json();
+                    })
+                    .then((data) => {
+                        const formattedData = {};
+                        data.numbers_of_examinations_for_unavailable_departments_by_month_by_department.forEach(
+                            (item) => {
+                                const { department_name, month, number } = item;
+
+                                if (!formattedData[month]) {
+                                    formattedData[month] = {
+                                        date: new Intl.DateTimeFormat("tr-TR", {
+                                            month: "long",
+                                        }).format(
+                                            new Date(2024, item.month - 1)
+                                        ),
+                                    };
+                                }
+                                formattedData[month][department_name] = number;
+                            }
+                        );
+
+                        const examinations = [
+                            ...new Set(
+                                data.numbers_of_examinations_for_unavailable_departments_by_month_by_department.map(
+                                    (item) => item.department_name
+                                )
+                            ),
+                        ];
+                        const chartDataArray = [["Tarih", ...examinations]];
+
+                        Object.values(formattedData).forEach((row) => {
+                            const rowArray = [row.date];
+                            examinations.forEach((examination) => {
+                                rowArray.push(row[examination] || 0);
+                            });
+                            chartDataArray.push(rowArray);
+                        });
+
+                        const chartData =
+                            google.visualization.arrayToDataTable(
+                                chartDataArray
+                            );
+
+                        const options = {
+                            titleTextStyle: {
+                                fontSize: 24,
+                                bold: true,
+                            },
+                            vAxis: { title: "Muayene Sayısı", format: "#" },
+                            hAxis: {
+                                title: "Tarih",
+                                // slantedText: true,
+                                // slantedTextAngle: 90,
+                            },
+                            seriesType: "bars",
+                            series: { [examinations.length]: { type: "line" } },
+                            chartArea: {
+                                top: 75,
+                                right: 220,
+                                bottom: 120,
+                                left: 100,
+                            },
+                        };
+
+                        const chart = new google.visualization.ComboChart(
+                            document.getElementById("chart_div2")
+                        );
+                        chart.draw(chartData, options);
+                    })
+                    .catch((error) => {
+                        console.error("Error fetching data:", error);
+                        alert(
+                            "Veri alınırken bir hata oluştu. Lütfen tekrar deneyin."
+                        );
+                    });
+            }
+
+            async function drawChart3() {
+                try {
+                    const response = await fetch(
+                        `<%= baseURL %>/api/revenues_of_examinations_for_unavailable_departments`
+                    );
+                    const result = await response.json();
+
+                    const chartData = [
+                        ["Departmanlar", "Elde Edilemeyen Gelirler (₺)", { role: "style" }],
+                    ];
+                    result.revenues_of_examinations_for_unavailable_departments.forEach((item) => {
+                        const color = generateColor();
+                        chartData.push([
+                            item.department_name,
+                            item.total_cost,
+                            color,
+                        ]);
+                    });
+
+                    const data =
+                        google.visualization.arrayToDataTable(chartData);
+
+                    const options = {
+                        hAxis: {
+                            title: "Departmanlar",
+                        },
+                        vAxis: {
+                            title: "Elde Edilemeyen Gelirler (₺)",
+                            format: "decimal",
+                        },
+                        legend: { position: "none" },
+                        chartArea: {
+                            top: 75,
+                            right: 100,
+                            bottom: 200,
+                            left: 170,
+                        },
+                    };
+
+                    const chart = new google.visualization.ColumnChart(
+                        document.getElementById("chart_div3")
+                    );
+
+                    chart.draw(data, options);
+                } catch (error) {
+                    console.error("Veri çekilirken hata oluştu:", error);
+                }
+            }
+
+            async function drawChart4() {
+                try {
+                    const response = await fetch(
+                        `<%= baseURL %>/api/numbers_of_examinations_for_unavailable_departments`
+                    );
+                    const result = await response.json();
+
+                    const chartData = [
+                        ["Departmanlar", "Yönlendirilme Sayısı", { role: "style" }],
+                    ];
+                    result.numbers_of_examinations_for_unavailable_departments.forEach((item) => {
+                        const color = generateColor();
+                        chartData.push([
+                            item.department_name,
+                            item.number,
+                            color,
+                        ]);
+                    });
+
+                    const data =
+                        google.visualization.arrayToDataTable(chartData);
+
+                    const options = {
+                        hAxis: {
+                            title: "Departmanlar",
+                        },
+                        vAxis: {
+                            title: "Yönlendirilme Sayısı",
+                            format: "decimal",
+                        },
+                        legend: { position: "none" },
+                        chartArea: {
+                            top: 75,
+                            right: 100,
+                            bottom: 200,
+                            left: 170,
+                        },
+                    };
+
+                    const chart = new google.visualization.ColumnChart(
+                        document.getElementById("chart_div4")
+                    );
+
+                    chart.draw(data, options);
+                } catch (error) {
+                    console.error("Veri çekilirken hata oluştu:", error);
+                }
+            }
+
+            // Rastgele renk oluşturma fonksiyonu
+            function generateColor() {
+                const letters = "0123456789ABCDEF";
+                let color = "#";
+                for (let i = 0; i < 6; i++) {
+                    color += letters[Math.floor(Math.random() * 16)];
+                }
+                return color;
+            }
+        </script>
+    </head>
+    <body class="navbar-fixed sidebar-fixed" id="body">
+        <div class="wrapper">
+            <%- include('../_partials/_sidebar') %>
+            <div class="page-wrapper">
+                <%- include('../_partials/_header') %>
+                <div class="content-wrapper">
+                    <div class="content">
+                        <div class="row">
+                            <div class="col-lg-12 pb-4">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <h1
+                                            class="text-center py-3"
+                                            style="
+                                                font-size: 25px;
+                                                font-weight: bold;
+                                            "
+                                        >
+                                            <!-- prettier-ignore -->
+                                            <small><i>Toplamda Aylara Göre</i><br /></small>
+                                            <!-- prettier-ignore -->
+                                            <span>Bulunmayan Departmanlara Yönlendirme Sayıları</span>
+                                        </h1>
+                                        <div
+                                            id="chart_div1"
+                                            style="
+                                                min-width: 100%;
+                                                height: 60vh;
+                                            "
+                                        ></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-12 pb-4">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <h1
+                                            class="text-center py-3"
+                                            style="
+                                                font-size: 25px;
+                                                font-weight: bold;
+                                            "
+                                        >
+                                            <!-- prettier-ignore -->
+                                            <small><i>Departman Bazında Aylara Göre</i><br /></small>
+                                            <!-- prettier-ignore -->
+                                            <span>Bulunmayan Departmanlara Yönlendirme Sayıları</span>
+                                        </h1>
+                                        <div
+                                            id="chart_div2"
+                                            style="
+                                                min-width: 100%;
+                                                height: 60vh;
+                                            "
+                                        ></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-12 pb-4">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <h1
+                                            class="text-center py-3"
+                                            style="
+                                                font-size: 25px;
+                                                font-weight: bold;
+                                            "
+                                        >
+                                            <!-- prettier-ignore -->
+                                            <small><i>Bulunmayan Departmanlara Yönlendirme Sonucu</i><br /></small>
+                                            <!-- prettier-ignore -->
+                                            <span>Elde Edilmeyen Gelirler (₺)</span>
+                                        </h1>
+                                        <div
+                                            id="chart_div3"
+                                            style="
+                                                min-width: 100%;
+                                                height: 60vh;
+                                            "
+                                        ></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-12 pb-4">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <h1
+                                            class="text-center py-3"
+                                            style="
+                                                font-size: 25px;
+                                                font-weight: bold;
+                                            "
+                                        >
+                                            <!-- prettier-ignore -->
+                                            <small><i>Bulunmayan Departmanlara Yönlendirme Sonucu</i><br /></small>
+                                            <!-- prettier-ignore -->
+                                            <span>Yönlendirme Sayıları</span>
+                                        </h1>
+                                        <div
+                                            id="chart_div4"
+                                            style="
+                                                min-width: 100%;
+                                                height: 60vh;
+                                            "
+                                        ></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <%- include('../_partials/_footer') %>
+            </div>
+        </div>
+        <%- include('../_partials/_scripts') %>
+    </body>
+</html>
