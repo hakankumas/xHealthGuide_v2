@@ -205,7 +205,7 @@ app.get(
     }
 );
 
-const PORT = 3009;
+const PORT = 3000;
 app.locals.baseURL = `http://localhost:${PORT}`;
 app.listen(PORT, () => {
     console.log(`Server is running at ${PORT}`);
