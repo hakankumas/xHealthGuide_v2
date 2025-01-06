@@ -11,6 +11,7 @@ const Count = require("./models/Count");
 const Doctor = require("./models/Doctor");
 const Sick = require("./models/Sick");
 const Loses = require("./models/Loses");
+const Department = require("./models/Department");
 
 app.get("/", async (req, res) => {
     const total_revenue = await Count.total_revenue();
@@ -37,10 +38,18 @@ app.get("/department", async (req, res) => {
 });
 
 app.get("/cost", async (req, res) => {
+    const list_departments = await Department.list_departments();
     res.render("./cost/index", {
         title: "Kayıp Kazançlar | Sağlık Rehberi KDS",
         activePage: "cost",
+
+        list_departments: list_departments[0],
     });
+});
+
+app.post("/department/update/examination_price", async (req, res) => {
+    const department = await Department.update_examination_price(req.body);
+    if (department) res.redirect("/cost");
 });
 
 app.get(
